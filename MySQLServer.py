@@ -1,26 +1,42 @@
 import mysql.connector
+from mysql.connector import Error
 
-#Connecting to the Database
 
-mydb = mysql.connector.connect(
-      host = 'localhost',
-      user = 'root',
-      password = 'root'
-)
+def create_database():
+    cursor = None  # Initialize cursor variable
+    connection = None  # Initialize connection variable
 
-mycursor = mydb.cursor()
+    try:
+        # Establishing the connection
+        connection = mysql.connector.connect(
+            host='localhost',
+            user='root',
+            password='root'
+        )
 
-#Executions
+        if connection.is_connected():
+            cursor = connection.cursor()
+            # Create database query
+            cursor.execute(
+                "CREATE DATABASE IF NOT EXISTS alx_book_store CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci")
+            print("Database 'alx_book_store' created successfully!")
 
-try:
-  mycursor.execute("CREATE DATABASE IF NOT EXISTS alx_book_store")
+    except Error as e:
+        print(f"Error: {e}")
+    except mysql.connector.Error as db_err:
+        print(f"Database error: {db_err}")
+    except mysql.connector.OperationalError as op_err:
+        print(f"Operational error: {op_err}")
+    except mysql.connector.ProgrammingError as prog_err:
+        print(f"Programming error: {prog_err}")
 
-except Exception as e:
-  print(e)
+    finally:
+        # Closing the cursor and connection
+        if cursor is not None:
+            cursor.close()
+        if connection is not None and connection.is_connected():
+            connection.close()
 
-else:
-  print("Database 'alx_book_store' created successfully!")
 
-finally:
-  mydb.close
-  mycursor.close
+if __name__ == "__main__":
+    create_database()
